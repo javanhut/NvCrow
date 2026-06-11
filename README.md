@@ -73,7 +73,8 @@ anything missing installs itself. Tab-completion works everywhere.
 **Plugin recipes** (pre-configured with keymaps):
 `telescope` `harpoon` `oil` `neo-tree` `nvim-tree` `flash` `trouble`
 `todo-comments` `surround` `zen-mode` `lazygit` `undotree` `copilot`
-`indent-guides` `dashboard` (NvCrow splash screen)
+`indent-guides` `dashboard` (NvCrow splash screen) `command-bar`
+(floating command palette via noice)
 
 **[Ivaldi VCS](https://github.com/javanhut/Ivaldi), built in:** if the `ivaldi` binary is on your system,
 NvCrow lights up automatically — current timeline in the statusline,
@@ -93,6 +94,8 @@ lualine, which-key, autopairs, indent autodetection, sane defaults
 
 | Keys | Action |
 |---|---|
+| `Ctrl+F` | fuzzy find files (telescope) |
+| `Ctrl+T` | toggle file tree |
 | `<space>ff` / `fg` | find files / grep (telescope) |
 | `gd` / `gr` / `K` | definition / references / docs |
 | `<space>ca` / `rn` | code action / rename |

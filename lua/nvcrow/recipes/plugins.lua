@@ -12,6 +12,7 @@ R.telescope = {
     },
     cmd = "Telescope",
     keys = {
+      { "<C-f>", "<cmd>Telescope find_files<cr>", desc = "Find files" },
       { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
       { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Grep text" },
       { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
@@ -63,7 +64,10 @@ R["neo-tree"] = {
       "MunifTanjim/nui.nvim",
     },
     cmd = "Neotree",
-    keys = { { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "File tree" } },
+    keys = {
+      { "<leader>e", "<cmd>Neotree toggle<cr>", desc = "File tree" },
+      { "<C-t>", "<cmd>Neotree toggle<cr>", desc = "File tree" },
+    },
     opts = {},
   },
 }
@@ -73,8 +77,19 @@ R["nvim-tree"] = {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     cmd = "NvimTreeToggle",
-    keys = { { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "File tree" } },
-    opts = {},
+    keys = {
+      { "<leader>e", "<cmd>NvimTreeToggle<cr>", desc = "File tree" },
+      { "<C-t>", "<cmd>NvimTreeToggle<cr>", desc = "File tree" },
+    },
+    opts = {
+      on_attach = function(bufnr)
+        local api = require("nvim-tree.api")
+        api.config.mappings.default_on_attach(bufnr)
+        -- nvim-tree's own <C-t> ("open in new tab") shadows the global
+        -- toggle inside the tree — make it close the tree instead.
+        vim.keymap.set("n", "<C-t>", api.tree.toggle, { buffer = bufnr, desc = "Close tree" })
+      end,
+    },
   },
 }
 
@@ -155,6 +170,22 @@ R.copilot = {
 
 R["indent-guides"] = {
   { "lukas-reineke/indent-blankline.nvim", main = "ibl", event = "VeryLazy", opts = {} },
+}
+
+R["command-bar"] = {
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    opts = {
+      cmdline = { view = "cmdline_popup" }, -- floating command bar
+      presets = {
+        command_palette = true, -- cmdline + completions together up top
+        bottom_search = true, -- / search stays put (less jarring)
+        long_message_to_split = true,
+      },
+    },
+  },
 }
 
 R.dashboard = {

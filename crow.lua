@@ -16,6 +16,7 @@ return {
     "telescope",
     "nvim-tree",
     "dashboard",
+    "command-bar",
   },
 
   options = {},
