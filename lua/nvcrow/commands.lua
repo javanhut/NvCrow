@@ -61,6 +61,7 @@ local function add(names)
       end
     elseif kind == "theme" then
       spec.theme = resolved
+      require("nvcrow.ui").apply_theme(resolved) -- live, no restart needed
       table.insert(added, resolved .. " (theme)")
     else
       local hint = #resolved > 0
@@ -138,7 +139,7 @@ local function sync()
   notify("Syncing plugins. LSP servers and tools install automatically on restart.")
 end
 
-local subcommands = { "add", "remove", "list", "sync", "ui" }
+local subcommands = { "add", "remove", "list", "sync", "ui", "theme" }
 
 local function complete(arglead, cmdline)
   local recipes = require("nvcrow.recipes")
@@ -175,6 +176,8 @@ function M.setup()
     local sub = table.remove(args, 1)
     if sub == nil or sub == "ui" then
       require("nvcrow.ui").open()
+    elseif sub == "theme" or sub == "themes" then
+      require("nvcrow.ui").themes()
     elseif sub == "add" and #args > 0 then
       add(args)
     elseif sub == "remove" and #args > 0 then
@@ -184,7 +187,7 @@ function M.setup()
     elseif sub == "sync" then
       sync()
     else
-      notify("Usage: :Crow [ui] | add <name...> | remove <name...> | list | sync", vim.log.levels.WARN)
+      notify("Usage: :Crow [ui] | theme | add <name...> | remove <name...> | list | sync", vim.log.levels.WARN)
     end
   end, {
     nargs = "*",

@@ -49,6 +49,14 @@ function M.resolve(spec)
     end,
   })
 
+  -- Keep the other themes installed (but not loaded) so the theme
+  -- picker can live-preview and switch without a restart.
+  for _, other in pairs(recipes.themes) do
+    if other.repo ~= theme.repo then
+      table.insert(state.plugins, { other.repo, name = other.name, lazy = true })
+    end
+  end
+
   -- Languages
   for _, name in ipairs(spec.langs or {}) do
     local canonical = recipes.lang_name(name)

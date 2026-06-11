@@ -4,6 +4,95 @@
 
 local M = {}
 
+-- Load a theme's plugin (pre-installed but lazy) and apply it now.
+-- Returns false when the plugin isn't on disk yet (needs a restart).
+function M.apply_theme(name)
+  local theme = require("nvcrow.recipes").themes[name]
+  if not theme then return false end
+  local plugin = theme.name or theme.repo:match("[^/]+$")
+  pcall(function()
+    require("lazy").load({ plugins = { plugin } })
+  end)
+  return pcall(vim.cmd.colorscheme, theme.colorscheme)
+end
+
+-- Theme picker: moving the cursor live-previews, Enter keeps it
+-- (saved to crow.lua, already applied — no restart), q/Esc reverts.
+function M.themes()
+  local recipes = require("nvcrow.recipes")
+  local spec_mod = require("nvcrow.spec")
+  local spec = spec_mod.load()
+  local names = recipes.names(recipes.themes)
+  local original = spec.theme
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].bufhidden = "wipe"
+  local lines, current_row = {}, 1
+  for i, name in ipairs(names) do
+    lines[i] = ("  %s %s"):format(name == spec.theme and "●" or " ", name)
+    if name == spec.theme then current_row = i end
+  end
+  table.insert(lines, 1, "  move to preview · ⏎ keep · q revert")
+  table.insert(lines, 2, "")
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].modifiable = false
+  local ns = vim.api.nvim_create_namespace("nvcrow_themes")
+  vim.api.nvim_buf_set_extmark(buf, ns, 0, 0, { line_hl_group = "Comment" })
+
+  local width = 38
+  local height = #lines
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = width,
+    height = height,
+    col = math.floor((vim.o.columns - width) / 2),
+    row = math.floor((vim.o.lines - height) / 2) - 1,
+    style = "minimal",
+    border = "rounded",
+    title = " Theme ",
+    title_pos = "center",
+  })
+  vim.wo[win].cursorline = true
+  vim.api.nvim_win_set_cursor(win, { current_row + 2, 4 })
+
+  local function hovered()
+    return names[vim.api.nvim_win_get_cursor(win)[1] - 2]
+  end
+
+  vim.api.nvim_create_autocmd("CursorMoved", {
+    buffer = buf,
+    callback = function()
+      local name = hovered()
+      if name and not M.apply_theme(name) then
+        vim.notify(name .. " isn't installed yet — restart Neovim first.", vim.log.levels.WARN, { title = "NvCrow" })
+      end
+    end,
+  })
+
+  local function close(keep)
+    if vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+    local name = keep
+    if not name then
+      M.apply_theme(original)
+      return
+    end
+    spec.theme = name
+    local ok, err = spec_mod.save(spec)
+    if not ok then
+      vim.notify(err, vim.log.levels.ERROR, { title = "NvCrow" })
+      return
+    end
+    vim.notify("Theme: " .. name, vim.log.levels.INFO, { title = "NvCrow" })
+  end
+
+  local opts = { buffer = buf, nowait = true }
+  vim.keymap.set("n", "<CR>", function() close(hovered()) end, opts)
+  vim.keymap.set("n", "q", function() close(nil) end, opts)
+  vim.keymap.set("n", "<Esc>", function() close(nil) end, opts)
+end
+
 function M.open()
   local recipes = require("nvcrow.recipes")
   local spec_mod = require("nvcrow.spec")
@@ -101,6 +190,7 @@ function M.open()
       if spec.theme ~= item.name then
         spec.theme = item.name
         dirty = true
+        M.apply_theme(item.name) -- instant feedback, no restart needed
       end
     else
       local list = item.kind == "lang" and spec.langs or spec.plugins

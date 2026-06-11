@@ -5,7 +5,7 @@
 --     :Crow list            :Crow sync
 
 return {
-  theme = "catppuccin",
+  theme = "tokyonight",
 
   langs = {
     "lua",

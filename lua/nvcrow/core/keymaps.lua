@@ -41,6 +41,7 @@ function M.setup()
 
   -- The Crow picker
   map("n", "<leader>cc", "<cmd>Crow<cr>", { desc = "Crow — add things" })
+  map("n", "<leader>ct", "<cmd>Crow theme<cr>", { desc = "Pick theme (live preview)" })
 end
 
 return M

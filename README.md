@@ -48,6 +48,7 @@ You never *have* to leave Neovim:
 
 ```
 :Crow                   opens the picker GUI — Enter toggles, q applies
+:Crow theme             theme picker with live preview — no restart
 :Crow add rust          adds rust: rust-analyzer, rustfmt, treesitter, crates.nvim
 :Crow add tokyonight    switches theme
 :Crow add folke/zen-mode.nvim   any GitHub plugin works too
