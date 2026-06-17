@@ -10,6 +10,7 @@ return {
   langs = {
     "lua",
     "rust",
+    "python",
   },
 
   plugins = {
