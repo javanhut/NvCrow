@@ -134,4 +134,19 @@ R.terraform = {
   treesitter = { "terraform", "hcl" },
 }
 
+R.oxigen = {
+  aliases = { "oxi", "oxigenlang" },
+  -- oxigen-lsp is a CUSTOM server: the `oxigen-lsp` binary on your PATH,
+  -- configured by the native lsp/oxigen_lsp.lua (copied from the OxigenLang
+  -- repo's editors/neovim/, e.g. via `make install-lsp-nvcrow`). It is NOT a
+  -- mason/lspconfig package, so it's listed under `lsp_custom` — enabled
+  -- directly with vim.lsp.enable and kept out of mason's ensure_installed.
+  --
+  -- No treesitter parser exists for Oxigen; highlighting comes from
+  -- syntax/oxigen.lua (ftdetect maps .oxi -> filetype "oxigen"). Formatting
+  -- falls back to the LSP (textDocument/formatting -> `oxigen fmt`), which
+  -- conform's `lsp_format = "fallback"` already routes through on save.
+  lsp_custom = { "oxigen_lsp" },
+}
+
 return R

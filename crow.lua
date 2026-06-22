@@ -11,6 +11,7 @@ return {
     "lua",
     "rust",
     "python",
+    "oxigen",
   },
 
   plugins = {

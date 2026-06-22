@@ -18,6 +18,7 @@ function M.resolve(spec)
   state.plugins = {}
   state.lsp = {}
   state.lsp_servers = {}
+  state.lsp_custom = {}
   state.mason_tools = {}
   -- Parsers everyone hits regardless of langs: shell scripts, docs,
   -- config files. Keeps highlighting solid out of the box.
@@ -67,6 +68,13 @@ function M.resolve(spec)
       for server, cfg in pairs(recipe.lsp or {}) do
         state.lsp[server] = cfg
         add_unique(state.lsp_servers, server)
+      end
+      -- Custom servers: a binary already on PATH, configured by a native
+      -- lsp/<name>.lua on the runtimepath. Not a mason/lspconfig package, so it
+      -- is enabled directly (see core/plugins.lua) and kept out of
+      -- mason-lspconfig's ensure_installed.
+      for _, server in ipairs(recipe.lsp_custom or {}) do
+        add_unique(state.lsp_custom, server)
       end
       for ft, formatters in pairs(recipe.formatters or {}) do
         state.formatters_by_ft[ft] = formatters

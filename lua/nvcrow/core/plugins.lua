@@ -86,6 +86,14 @@ return {
         automatic_enable = true,
       })
 
+      -- Custom servers (e.g. oxigen-lsp): the binary is already on PATH and its
+      -- config comes from a native lsp/<name>.lua on the runtimepath. They are
+      -- NOT mason packages, so enable them directly instead of via
+      -- mason-lspconfig's automatic_enable.
+      for _, server in ipairs(state.lsp_custom or {}) do
+        vim.lsp.enable(server)
+      end
+
       -- Install non-LSP tools (formatters, linters) from recipes.
       local ok, registry = pcall(require, "mason-registry")
       if ok then
